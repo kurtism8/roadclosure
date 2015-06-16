@@ -1,0 +1,9 @@
+﻿@{
+    var sUrl = "http://app.kitchener.ca/opendata/xml/roadclosure.xml"; 
+        
+
+    WebClient wc = new WebClient();
+    Response.ContentType = "text/xml";
+    Response.Write(wc.DownloadString(sUrl));
+    
+}

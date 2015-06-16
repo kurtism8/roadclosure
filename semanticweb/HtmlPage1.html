@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Road Closures</title>
+    <style>
+        html, body, #map-canvas {
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+    
+    <script>
+
+
+// Centres map at Kitchener Ontario roadmap to zoom level 13
+function initialize() {
+  var mapOptions = {
+    zoom: 13,
+    center: new google.maps.LatLng(43.4500, -80.4833),
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+
+  var map = new google.maps.Map(document.getElementById('map-canvas'),
+      mapOptions);
+
+  //var polylines = [];
+  //var snappedCoordinates = [];
+
+    var flightPlanCoordinates = [
+    new google.maps.LatLng(43.4540842, -80.5057405),
+    new google.maps.LatLng(43.4550665, -80.505141),
+    new google.maps.LatLng(43.4580665, -80.505841)
+    // to get lat and long on google maps copy and paste into url
+    //https://maps.googleapis.com/maps/api/geocode/json?address=agnes+street+and+king+street+west+kitchener
+    ];
+
+  var flightPath = new google.maps.Polyline({
+    path: flightPlanCoordinates,
+    geodesic: true,
+    strokeColor: '#FF0000',
+    strokeOpacity: 1.0,
+    strokeWeight: 2
+  });
+
+  flightPath.setMap(map);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+</head>
+<body>
+    <div id="map-canvas"></div>
+</body>
+</html>
