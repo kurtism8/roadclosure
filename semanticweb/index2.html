@@ -40,37 +40,57 @@
                             var location = $scope.a[i].street[0] + " and " + $scope.a[i].fromstreet;
                             var location2 = $scope.a[i].street[0] + " and " + $scope.a[i].tostreet;
 
-                            $http.get("https://maps.googleapis.com/maps/api/geocode/json?address=" + location + ", Kitchener, ON N2G, Canada")
-                            .success(jQuery.proxy(function (data) {
-                                this.from = data.results[0].geometry.location;
+                            $scope.a[i].points = new Array();
 
-                            }, $scope.a[i]
-                            ));
+                            function Geocoded(data) {
+                                if (data.results.length==0) {
+                                    return;
+                                }
 
+                                this.points.push(data.results[0].geometry.location);
+
+                                
+
+                                if (this.points.length== 2)
+                                {
+                                    console.log(this);
+                                    var spolyline = "https://roads.googleapis.com/v1/snapToRoads?key=AIzaSyB65F2jdlDbKrarQ4aJ0RiwHM-cUiwivq4&interpolate=true&path="
+                                    + this.points[0].lat + "," + this.points[0].lng + "|" + this.points[1].lat + "," + this.points[1].lng;
+
+                                    $http.get(spolyline).success(function (data) {
+
+
+                                       
+                                        var flightPlanCoordinates = new Array();
+                                        for (var i = 0; i < data.snappedPoints.length; i++)
+                                        {
+
+                                            var point = data.snappedPoints[i].location;
+                                            flightPlanCoordinates.push(new google.maps.LatLng(point.latitude, point.longitude));
+                                        }
+                                        var flightPath = new google.maps.Polyline({
+                                            path: flightPlanCoordinates,
+                                            geodesic: true,
+                                            strokeColor: '#FF0000',
+                                            strokeOpacity: 1.0,
+                                            strokeWeight: 2
+                                        });
+
+                                        flightPath.setMap($scope.map);
+
+                                    });
+ 
+                                }
+
+                            }
+
+
+                                                                                    
                             $http.get("https://maps.googleapis.com/maps/api/geocode/json?address=" + location2 + ", Kitchener, ON N2G, Canada")
-                            .success(jQuery.proxy(function (data) {
-                                this.to = data.results[0].geometry.location;
-
-                                console.log(this);
-
-                                var flightPlanCoordinates = [
-                                new google.maps.LatLng(this.from.lat, this.from.lng),
-                                new google.maps.LatLng(this.to.lat, this.to.lng)
-
-                                ];
-
-                                var flightPath = new google.maps.Polyline({
-                                    path: flightPlanCoordinates,
-                                    geodesic: true,
-                                    strokeColor: '#FF0000',
-                                    strokeOpacity: 1.0,
-                                    strokeWeight: 2
-                                });
-
-                                flightPath.setMap($scope.map);
-
-                            }, $scope.a[i])
+                            .success(jQuery.proxy(Geocoded, $scope.a[i])
                             );
+                            $http.get("https://maps.googleapis.com/maps/api/geocode/json?address=" + location + ", Kitchener, ON N2G, Canada")
+                            .success(jQuery.proxy(Geocoded, $scope.a[i]));
                         }
                     }).
                     error(function (data, status, headers, config) {
